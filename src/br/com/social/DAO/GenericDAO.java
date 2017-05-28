@@ -12,10 +12,11 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+
+import br.com.social.model.contato.enums.Perfil;
 
 @Component
-public abstract class GenericDAO<ID extends Serializable, T> implements IGenericDAO<ID, T> {
+public abstract class GenericDAO<ID extends Serializable, T> implements IGenericDAO<ID, T>, IGenericContato<ID, T> {
 	private Class<T> persistenceClass;
 	@PersistenceContext
 	private EntityManager manager;
@@ -33,71 +34,72 @@ public abstract class GenericDAO<ID extends Serializable, T> implements IGeneric
 	}
 
 	@Override
-	@Transactional
 	public T Inserir(T modelo) throws Exception {
 		// TODO Auto-generated method stub
-		try {
-			this.getManager().persist(modelo);
-			return modelo;
-		} catch (Exception e) {
-			// TODO: handle exception
-			throw e;
-		}
+		getManager().persist(modelo);
+		return modelo;
 	}
 
 	@Override
-	@Transactional
 	public T Alterar(T modelo) throws Exception {
 		// TODO Auto-generated method stub
-		try {
-			this.getManager().merge(modelo);
-			return modelo;
-		} catch (Exception e) {
-			// TODO: handle exception
-			throw e;
-		}
+		getManager().merge(modelo);
+		return modelo;
 	}
 
 	@Override
-	@Transactional
 	public void Remover(T modelo) throws Exception {
 		// TODO Auto-generated method stub
-		try {
-			this.getManager().remove(modelo);
-		} catch (Exception e) {
-			// TODO: handle exception
-			throw e;
-		}
+		getManager().remove(modelo);
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public T Buscar(ID id) throws NoResultException, Exception {
 		// TODO Auto-generated method stub
-		try {
-			return this.getManager().find(getPersistenceClass(), id);
-		} catch (Exception e) {
-			// TODO: handle exception
-			throw e;
-		}
+		return getManager().find(getPersistenceClass(), id);
 	}
 
 	@Override
-	@Transactional(readOnly = true)
 	public List<T> Listar() throws NoResultException, Exception {
 		// TODO Auto-generated method stub
 		try {
-			CriteriaBuilder builder = this.getManager().getCriteriaBuilder();
+			CriteriaBuilder builder = getManager().getCriteriaBuilder();
 			CriteriaQuery<T> criteria = builder.createQuery(getPersistenceClass());
-			Root<T> root = criteria.from(this.getPersistenceClass());
+			Root<T> root = criteria.from(getPersistenceClass());
 			criteria.select(root);
-			TypedQuery<T> query = this.getManager().createQuery(criteria);
-
-			return query.getResultList();
+			TypedQuery<T> query = getManager().createQuery(criteria);
+			
+			if (query.getResultList().isEmpty())
+				return query.getResultList();
+			else
+				return null;
+			
 		} catch (Exception e) {
 			// TODO: handle exception
 			throw e;
 		}
+	}
+
+	@Override
+	public List<T> Listar(ID id) throws NoResultException, Exception {
+		// TODO Auto-generated method stub
+		CriteriaBuilder builder = getManager().getCriteriaBuilder();
+		CriteriaQuery<T> criteria = builder.createQuery(getPersistenceClass());
+		Root<T> root = criteria.from(getPersistenceClass());
+		
+		criteria.select(root)
+			.where(
+				builder.and(
+						builder.equal(root.get("contato"), id),
+						builder.equal(root.get("perfil"), Perfil.PUBLICO)
+				)
+			);
+		
+		List<T> query = getManager().createQuery(criteria).getResultList();
+		if(!query.isEmpty())
+			return query;
+		else
+			return null;
 	}
 
 	// Getter And Setters

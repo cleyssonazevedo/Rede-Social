@@ -1,5 +1,7 @@
 package br.com.social.DAO.login;
 
+/**
+ * 
 import javax.persistence.NoResultException;
 import javax.persistence.Tuple;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -14,7 +16,6 @@ import br.com.social.exception.UnauthorizedException;
 import br.com.social.model.Login;
 import br.com.social.model.contato.Contato;
 
-@Component
 public class LoginDAO extends GenericDAO<Long, Login> implements ILoginDAO {
 
 	public LoginDAO() {
@@ -53,3 +54,8 @@ public class LoginDAO extends GenericDAO<Long, Login> implements ILoginDAO {
 	}
 
 }
+
+*/
+ public class LoginDAO {
+	 
+ }

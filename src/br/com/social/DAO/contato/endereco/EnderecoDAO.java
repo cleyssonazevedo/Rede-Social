@@ -12,5 +12,4 @@ public class EnderecoDAO extends GenericDAO<Long, Endereco> implements IEndereco
 		// TODO Auto-generated constructor stub
 		super(Endereco.class);
 	}
-
 }

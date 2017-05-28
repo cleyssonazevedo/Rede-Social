@@ -17,9 +17,15 @@ import javax.persistence.ForeignKey;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import br.com.social.model.contato.enums.Perfil;
+import br.com.social.model.contato.enums.TipoEmail;
+
 @Entity
 public class Email implements Serializable {
-	private static final long serialVersionUID = -7741393511974698310L;
+	@JsonIgnore
+	public static final long serialVersionUID = -7741393511974698310L;
 
 	public Email() {
 		// TODO Auto-generated constructor stub
@@ -29,15 +35,23 @@ public class Email implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@JsonIgnore
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_cliente", updatable = false, foreignKey = @ForeignKey(name = "fk_email_contato"), nullable = false)
 	private Contato contato;
+	
 	@Column(nullable = false, updatable = false, length = 255)
 	private String email;
+	
 	@Column(columnDefinition = "ENUM('PESSOAL', 'COMERCIAL', 'OUTROS') NOT NULL")
 	@Enumerated(EnumType.STRING)
 	private TipoEmail tipo;
+	
+	@Enumerated(EnumType.STRING)
+	@Column(columnDefinition = "ENUM('PUBLICO', 'PRIVADO') NOT NULL")
+	private Perfil perfil;
 
 	public Long getId() {
 		return id;
@@ -71,12 +85,11 @@ public class Email implements Serializable {
 		this.tipo = tipo;
 	}
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
+	public Perfil getPerfil() {
+		return perfil;
 	}
 
-}
-
-enum TipoEmail {
-	PESSOAL, COMERCIAL, OUTROS;
+	public void setPerfil(Perfil perfil) {
+		this.perfil = perfil;
+	}
 }

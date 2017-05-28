@@ -17,43 +17,63 @@ import javax.persistence.ManyToOne;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import br.com.social.model.contato.enums.Estado;
+import br.com.social.model.contato.enums.Perfil;
+import br.com.social.model.contato.enums.TipoEndereco;
+
 @Entity
 public class Endereco implements Serializable {
-	private static final long serialVersionUID = 3587275967215560319L;
+	@JsonIgnore
+	public static final long serialVersionUID = 3587275967215560319L;
 
 	public Endereco() {
 		// TODO Auto-generated constructor stub
 		this.contato = null;
 	}
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@JsonIgnore
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_contato", nullable = false, updatable = false, foreignKey = @ForeignKey(name = "fk_endereco_contato"))
 	private Contato contato;
+	
 	@Column(nullable = false, updatable = false, length = 255)
 	private String logradouro;
+	
 	@Column(nullable = false, updatable = false, length = 5)
 	private String numero;
+	
 	@Column(nullable = false, updatable = false, length = 255)
 	private String bairro;
+	
 	@Column(nullable = false, updatable = false, length = 255)
 	private String cidade;
+	
 	@Column(columnDefinition = "ENUM('AC', 'AL', 'AM', 'AP', 'BA', 'CE', 'DF', 'ES', "
 			+ "'GO', 'MA', 'MG', 'MS', 'MT', 'PA', 'PB', 'PE', 'PI', 'PR', 'RJ', 'RN', 'RO', "
 			+ "'RR', 'RS', 'SC', 'SE', 'SP', 'TO') NOT NULL")
 	@Enumerated(EnumType.STRING)
 	private Estado estado;
+	
 	@Column(nullable = true, updatable = false, length = 255)
 	private String complemento;
+	
 	@Column(columnDefinition = "CHAR(8) NOT NULL")
 	private String cep;
 
 	@Column(columnDefinition = "ENUM('RESIDENCIAL', 'COMERCIAL', 'OUTRO') NOT NULL")
 	@Enumerated(EnumType.STRING)
-	private Tipo tipo;
+	private TipoEndereco tipo;
+
+	@Enumerated(EnumType.STRING)
+	@Column(columnDefinition = "ENUM('PUBLICO', 'PRIVADO') NOT NULL")
+	private Perfil perfil;
 
 	public Long getId() {
 		return id;
@@ -119,62 +139,27 @@ public class Endereco implements Serializable {
 		this.complemento = complemento;
 	}
 
-	public Tipo getTipo() {
-		return tipo;
-	}
-
 	public String getCep() {
 		return cep;
 	}
 
-	public void setCep(String cep) throws Exception {
-		if(cep.length() == 8)
-			this.cep = cep;
-		else {
-			this.cep = null;
-			throw new Exception("Tamanho incorreto CEP!");
-		}
+	public void setCep(String cep) {
+		this.cep = cep;
 	}
 
-	public void setTipo(Tipo tipo) {
+	public TipoEndereco getTipo() {
+		return tipo;
+	}
+
+	public void setTipo(TipoEndereco tipo) {
 		this.tipo = tipo;
 	}
 
-	public static long getSerialversionuid() {
-		return serialVersionUID;
+	public Perfil getPerfil() {
+		return perfil;
 	}
 
-}
-
-enum Estado {
-	AC, // Acre
-	AL, // Alagoas
-	AP, // Amapá
-	AM, // Amazonas
-	BA, // Bahia
-	CE, // Ceará
-	DF, // Distrito Federal
-	ES, // Espírito Santo
-	GO, // Goiás
-	MA, // Maranhão
-	MT, // Mato Grosso
-	MS, // Mato Grosso do Sul
-	MG, // Minas Gerais
-	PA, // Pará
-	PB, // Paraíba
-	PR, // Paraná
-	PE, // Pernambuco
-	PI, // Piauí
-	RR, // Roraima
-	RO, // Rondônia
-	RJ, // Rio de Janeiro
-	RN, // Rio Grande do Norte
-	RS, // Rio Grande do Sul
-	SC, // Santa Catarina
-	SP, // São Paulo
-	SE; // Sergipe
-}
-
-enum Tipo {
-	RESIDENCIAL, COMERCIAL, OUTRO;
+	public void setPerfil(Perfil perfil) {
+		this.perfil = perfil;
+	}
 }

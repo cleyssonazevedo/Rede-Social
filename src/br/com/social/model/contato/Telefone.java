@@ -17,32 +17,45 @@ import javax.persistence.ManyToOne;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import br.com.social.model.contato.enums.Perfil;
+import br.com.social.model.contato.enums.TipoTelefone;
+
 @Entity
 public class Telefone implements Serializable {
-	private static final long serialVersionUID = -3203341311844235685L;
-
-	public Telefone() {
-		// TODO Auto-generated constructor stub
-		this.contato = null;
-		this.ddi = "0055";
-	}
+	@JsonIgnore
+	public static final long serialVersionUID = -3203341311844235685L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
+	@JsonIgnore
 	@OnDelete(action = OnDeleteAction.CASCADE)
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "id_contato", updatable = false, foreignKey = @ForeignKey(name = "fk_telefone_contato"), nullable = false)
 	private Contato contato;
-	@Column(columnDefinition = "CHAR(4) NOT NULL DEFAULT '0055'")
-	private String ddi;
+	
 	@Column(columnDefinition = "CHAR(2) NOT NULL")
 	private String ddd;
-	@Column(columnDefinition = "VARCHAR(25) NOT NULL")
+	
+	@Column(nullable = false, length = 25)
 	private String numero;
-	@Column(columnDefinition = "ENUM('FIXO', 'CELULAR', 'COMERCIAL', 'FAX') NOT NULL")
+	
+	@Column(columnDefinition = "ENUM('FIXO', 'CELULAR', 'COMERCIAL', 'OUTROS') NOT NULL")
 	@Enumerated(EnumType.STRING)
-	private TiposTelefones tipo;
+	private TipoTelefone tipo;
+
+	@Enumerated(EnumType.STRING)
+	@Column(columnDefinition = "ENUM('PUBLICO', 'PRIVADO') NOT NULL")
+	private Perfil perfil;
+	
+	
+	public Telefone() {
+		// TODO Auto-generated constructor stub
+		this.contato = null;
+	}
 
 	public Long getId() {
 		return id;
@@ -58,14 +71,6 @@ public class Telefone implements Serializable {
 
 	public void setContato(Contato contato) {
 		this.contato = contato;
-	}
-
-	public String getDdi() {
-		return ddi;
-	}
-
-	public void setDdi(String ddi) {
-		this.ddi = ddi;
 	}
 
 	public String getDdd() {
@@ -84,20 +89,24 @@ public class Telefone implements Serializable {
 		this.numero = numero;
 	}
 
-	public TiposTelefones getTipo() {
+	public TipoTelefone getTipo() {
 		return tipo;
 	}
 
-	public void setTipo(TiposTelefones tipo) {
+	public void setTipo(TipoTelefone tipo) {
 		this.tipo = tipo;
+	}
+
+	public Perfil getPerfil() {
+		return perfil;
+	}
+
+	public void setPerfil(Perfil perfil) {
+		this.perfil = perfil;
 	}
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
 	}
 
-}
-
-enum TiposTelefones {
-	FIXO, COMERCIAL, CELULAR, RECADO, OUTROS;
 }
