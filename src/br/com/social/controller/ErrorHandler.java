@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import br.com.social.exception.ConstraintViolationException;
+import br.com.social.exception.UnauthorizedException;
 
 @Component
 public interface ErrorHandler {
@@ -16,6 +17,11 @@ public interface ErrorHandler {
 	@ExceptionHandler(NoResultException.class)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	default void NoResultExceptionHandler(NoResultException e){
+	}
+	
+	@ExceptionHandler(UnauthorizedException.class)
+	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	default void UnauthorizedHandler(UnauthorizedException e) {
 	}
 	
 	@ExceptionHandler(ConstraintViolationException.class)
