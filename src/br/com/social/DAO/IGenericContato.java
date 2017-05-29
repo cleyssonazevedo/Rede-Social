@@ -18,5 +18,5 @@ public interface IGenericContato <ID, T> {
 	 * @throws Exception Em caso de erros em geral
 	 */
 	@Transactional(readOnly = true)
-	List<T> Listar(ID id) throws NoResultException, Exception;
+	List<T> Listar(ID id, Acesso acesso) throws NoResultException, Exception;
 }

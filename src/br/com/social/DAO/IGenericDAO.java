@@ -30,12 +30,12 @@ public interface IGenericDAO<ID extends Serializable, T> {
 	T Alterar(T modelo) throws Exception;
 	
 	/**
-	 * Método padrão para deleção
-	 * @param modelo Objeto que será deletado
+	 * Método padrão para remoção
+	 * @param id Id do item no banco de dados
 	 * @throws Exception Em caso de erros em geral
 	 */
 	@Transactional
-	void Remover(T modelo) throws Exception;
+	void Remover(ID id) throws NoResultException, Exception;
 	
 	/**
 	 * Método padrão para busca de um objeto

@@ -48,9 +48,13 @@ public abstract class GenericDAO<ID extends Serializable, T> implements IGeneric
 	}
 
 	@Override
-	public void Remover(T modelo) throws Exception {
+	public void Remover(ID id) throws NoResultException, Exception {
 		// TODO Auto-generated method stub
-		getManager().remove(modelo);
+		Object object = getManager().find(getPersistenceClass(), id);
+		if(object != null)
+			getManager().remove(object);
+		else
+			throw new NoResultException();
 	}
 
 	@Override
@@ -81,19 +85,26 @@ public abstract class GenericDAO<ID extends Serializable, T> implements IGeneric
 	}
 
 	@Override
-	public List<T> Listar(ID id) throws NoResultException, Exception {
+	public List<T> Listar(ID id, Acesso acesso) throws NoResultException, Exception {
 		// TODO Auto-generated method stub
 		CriteriaBuilder builder = getManager().getCriteriaBuilder();
 		CriteriaQuery<T> criteria = builder.createQuery(getPersistenceClass());
 		Root<T> root = criteria.from(getPersistenceClass());
 		
+		if(acesso == Acesso.PARCIAL){
 		criteria.select(root)
 			.where(
 				builder.and(
-						builder.equal(root.get("contato"), id),
-						builder.equal(root.get("perfil"), Perfil.PUBLICO)
+					builder.equal(root.get("contato"), id),
+					builder.equal(root.get("perfil"), Perfil.PUBLICO)
 				)
 			);
+		} else {
+			criteria.select(root)
+				.where(
+					builder.equal(root.get("contato"), id)
+				);
+		}
 		
 		List<T> query = getManager().createQuery(criteria).getResultList();
 		if(!query.isEmpty())
@@ -114,5 +125,4 @@ public abstract class GenericDAO<ID extends Serializable, T> implements IGeneric
 	public void setManager(EntityManager manager) {
 		this.manager = manager;
 	}
-
 }

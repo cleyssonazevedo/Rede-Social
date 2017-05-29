@@ -2,6 +2,8 @@ package br.com.social.controller;
 
 import javax.persistence.NoResultException;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +19,11 @@ public interface ErrorHandler {
 	@ExceptionHandler(NoResultException.class)
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	default void NoResultExceptionHandler(NoResultException e){
+	}
+	
+	@ExceptionHandler(JSONException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	default void JSONException(JSONObject e){
 	}
 	
 	@ExceptionHandler(UnauthorizedException.class)

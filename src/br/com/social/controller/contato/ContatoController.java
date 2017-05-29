@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import br.com.social.DAO.Acesso;
 import br.com.social.DAO.contato.IContatoDAO;
 import br.com.social.DAO.contato.email.IEmailDAO;
 import br.com.social.DAO.contato.endereco.IEnderecoDAO;
@@ -34,6 +35,13 @@ public class ContatoController implements ErrorHandler {
 	@Autowired
 	private ITelefoneDAO telefoneDAO;
 	
+	/**
+	 * Acesso publico
+	 * @param contato
+	 * @return
+	 * @throws ConstraintViolationException
+	 * @throws Exception
+	 */
 	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public Contato Cadastrar(@RequestBody Contato contato) throws ConstraintViolationException, Exception {
@@ -58,6 +66,7 @@ public class ContatoController implements ErrorHandler {
 		
 		contatoDAO.Inserir(dados);
 		contato.setId(dados.getId());
+		contato.setRegistro(dados.getRegistro());
 		
 		for(Email email : contato.getEmails()){
 			email.setContato(dados);
@@ -80,29 +89,35 @@ public class ContatoController implements ErrorHandler {
 		return contato;
 	}
 	
-	
+	/**
+	 * Acesso publico
+	 * @param conta
+	 * @return
+	 * @throws NoResultException
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/{conta}")
 	@ResponseBody
 	@Cacheable
 	public Contato BuscarPorConta(@PathVariable String conta) throws NoResultException, Exception {
-		br.com.social.model.contato.Contato contato = contatoDAO.BuscarPorConta(conta);
+		br.com.social.model.contato.Contato contato = contatoDAO.BuscarPorConta(conta, Acesso.PARCIAL);
 		if(contato != null){
-			Contato view = new Contato();
-			view.setId(contato.getId());
-			view.setNome(contato.getNome());
-			view.setSobrenome(contato.getSobrenome());
-			view.setConta(conta);
-			view.setRegistro(contato.getRegistro());
-			view.setNascimento(contato.getNascimento());
-			view.setPerfil(contato.getPerfil());
-			
-			view.setEnderecos(enderecoDAO.Listar(contato.getId()));
-			view.setEmails(emailDAO.Listar(contato.getId()));
-			view.setTelefones(telefoneDAO.Listar(contato.getId()));
+			Contato view = new Contato.Builder()
+				.setId(contato.getId())
+				.setNome(contato.getNome())
+				.setSobrenome(contato.getSobrenome())
+				.setConta(conta)
+				.setRegistro(contato.getRegistro())
+				.setNascimento(contato.getNascimento())
+				.setPerfil(contato.getPerfil())
+				.setEnderecos(enderecoDAO.Listar(contato.getId(), Acesso.PARCIAL))
+				.setEmails(emailDAO.Listar(contato.getId(), Acesso.PARCIAL))
+				.setTelefones(telefoneDAO.Listar(contato.getId(), Acesso.PARCIAL))
+					.build();
 			
 			return view;
 		} else
 			throw new NoResultException();
 	}
-
+	
 }

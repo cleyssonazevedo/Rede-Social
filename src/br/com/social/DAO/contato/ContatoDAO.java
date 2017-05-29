@@ -8,6 +8,7 @@ import javax.persistence.criteria.Root;
 
 import org.springframework.stereotype.Component;
 
+import br.com.social.DAO.Acesso;
 import br.com.social.DAO.GenericDAO;
 import br.com.social.exception.UnauthorizedException;
 import br.com.social.model.contato.Contato;
@@ -59,19 +60,26 @@ public class ContatoDAO extends GenericDAO<Long, Contato> implements IContatoDAO
 	}
 
 	@Override
-	public Contato BuscarPorConta(String conta) throws NoResultException, Exception {
+	public Contato BuscarPorConta(String conta, Acesso acesso) throws NoResultException, Exception {
 		// TODO Auto-generated method stub
 		CriteriaBuilder builder = super.getManager().getCriteriaBuilder();
 		CriteriaQuery<Contato> criteria = builder.createQuery(Contato.class);
 		Root<Contato> root = criteria.from(Contato.class);
 		
-		criteria.select(root)
+		if(acesso.equals(Acesso.PARCIAL)){
+			criteria.select(root)
 			.where(
 				builder.and(
 					builder.equal(root.get("conta"), conta),
 					builder.equal(root.get("perfil"), Perfil.PUBLICO)
 				)
 			);
+		} else {
+			criteria.select(root)
+			.where(
+				builder.equal(root.get("conta"), conta)
+			);
+		}
 		
 		return super.getManager().createQuery(criteria).getSingleResult();
 	}
